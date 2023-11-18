@@ -4,7 +4,7 @@ from app.appserver.config import Dir, ConfigureFile, AppConf
 from datetime import datetime
 import sys
 import psutil
-from app.appserver.handler import Service
+from app.appserver.handler import ServiceHandler
 
 
 class Server:
@@ -22,7 +22,7 @@ class Server:
 
     def add_services(self):
         api = Api(self.app)
-        for s in Service.__subclasses__():
+        for s in ServiceHandler.__subclasses__():
             api.add_resource(s, f'{AppConf.PROJECT_PREFIX}{s.URL}')
 
     @staticmethod
@@ -32,14 +32,19 @@ class Server:
             if not d.exists():
                 d.mkdir(parents=True)
 
-    @staticmethod
-    def server_info():
+    @property
+    def count_urls(self):
+        return len(list(self.app.url_map.iter_rules()))
+
+    def server_info(self):
         print(f"""
     ######################### Server Info #########################
     | python    | {sys.version}
     | platform  | {sys.platform}
     | cpus      | {psutil.cpu_count()}
     | start     | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+    | urls      | {self.count_urls}
+    | prefix    | {AppConf.PROJECT_PREFIX}
     | root      | {Dir.ROOT}
     | data      | {Dir.DATA}
     | log       | {Dir.LOG}
