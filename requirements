@@ -2,3 +2,4 @@ flask
 loguru
 python-dotenv
 psutil
+flask-restful

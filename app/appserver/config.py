@@ -10,7 +10,10 @@ class Dir:
 
 
 class AppConf:
-    pass
+    HOST = '0.0.0.0'
+    PORT = '9938'
+    DEBUG = True
+    PROJECT_PREFIX = '/hang'
 
 
 class ConfigureFile:

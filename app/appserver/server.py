@@ -1,25 +1,29 @@
 from flask import Flask
-from app.appserver.config import Dir, ConfigureFile
+from flask_restful import Api
+from app.appserver.config import Dir, ConfigureFile, AppConf
 from datetime import datetime
 import sys
 import psutil
+from app.appserver.handler import Service
 
 
 class Server:
-    def __init__(self, name, host='0.0.0.0', port=9938, debug=True):
+    def __init__(self, name, host=None, port=None, debug=None):
         self.app = Flask(name)
-        self.host = host
-        self.port = port
-        self.debug = debug
+        self.host = host or AppConf.HOST
+        self.port = port or AppConf.PORT
+        self.debug = debug if debug is not None else AppConf.DEBUG
 
     def run(self):
         self.init_dirs()
-        self.add_routers()
+        self.add_services()
         self.server_info()
         self.app.run(host=self.host, port=self.port, debug=self.debug)
 
-    def add_routers(self):
-        pass
+    def add_services(self):
+        api = Api(self.app)
+        for s in Service.__subclasses__():
+            api.add_resource(s, f'{AppConf.PROJECT_PREFIX}{s.URL}')
 
     @staticmethod
     def init_dirs():
