@@ -16,5 +16,11 @@ class AppConf:
     PROJECT_PREFIX = '/hang'
 
 
+class LogConf:
+    RUNTIME_FILE = Dir.LOG / 'runtime.log'
+    RUNTIME_FORMAT = '{time:HH:mm:ss.SSS} - {file} - {function}() - {line} - [{thread.name}] - {level} - {message}'
+    SERVER_FILE = Dir.LOG / 'server.log'
+
+
 class ConfigureFile:
     ENV = Dir.ROOT / '.env'
