@@ -5,7 +5,7 @@ from datetime import datetime
 import sys
 import psutil
 from app.appserver.handler import ServiceHandler, HandlerFuncs
-
+from app import service
 
 class Server:
     def __init__(self, name, host=None, port=None, debug=None):
@@ -17,11 +17,15 @@ class Server:
     def run(self):
         self.init_dirs()
         self.init_db()
+        self.import_services()
         self.add_routers()
         self.add_handlers()
         self.add_scheduler()
         self.server_info()
         self.app.run(host=self.host, port=self.port, debug=self.debug)
+
+    def import_services(self):
+        pass
 
     def add_routers(self):
         api = Api(self.app, prefix=AppConf.PROJECT_PREFIX)
@@ -31,8 +35,8 @@ class Server:
     def add_handlers(self):
         self.app.errorhandler(Exception)(HandlerFuncs.error_exception_handler)
         self.app.errorhandler(404)(HandlerFuncs.error_404_handler)
-        self.app.before_request(HandlerFuncs.before_request_handler)
-        self.app.after_request(HandlerFuncs.after_request_handler)
+        self.app.before_request(HandlerFuncs.before_handler)
+        self.app.after_request(HandlerFuncs.after_handler)
 
     def add_scheduler(self):
         pass
@@ -53,7 +57,7 @@ class Server:
 
     def server_info(self):
         print(f"""
-    ######################### Server Info #########################
+    ######################### Version {AppConf.VERSION} #########################
     | python    | {sys.version}
     | platform  | {sys.platform}
     | cpus      | {psutil.cpu_count()}
@@ -64,5 +68,5 @@ class Server:
     | data      | {Dir.DATA}
     | log       | {Dir.LOG}
     | .env      | {ConfigureFile.ENV}
-    ###############################################################
+    ################################################################
         """)

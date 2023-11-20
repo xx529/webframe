@@ -3,8 +3,8 @@ from dataclasses import dataclass, asdict
 from functools import wraps
 import threading
 import uuid
-from app.appserver.logger import logger
-import random
+from app.appserver.logger import ServerLogContent, slogger, rlogger
+from flask import request
 
 
 @dataclass
@@ -20,62 +20,60 @@ class ResponseJson:
 class HandlerFuncs:
 
     @staticmethod
-    def log_start_handler(func):
-        @wraps(func)
-        def start_log(*args, **kwargs):
-            logger.info(f'log start')
-            return func(*args, **kwargs)
-
-        return start_log
-
-    @staticmethod
     def auth_handler(func):
+        rlogger.info('auth')
+
         @wraps(func)
-        def auth(*args, **kwargs):
-            logger.info('auth')
+        def wrapper(*args, **kwargs):
             x = func(*args, **kwargs)
             return x
 
-        return auth
+        return wrapper
 
     @staticmethod
     def param_handler(func):
-        @wraps(func)
-        def params(*args, **kwargs):
-            logger.info('param')
-            if random.random() > 0.5:
-                return ResponseJson(data='', code=400, message='param fail').to_dict()
-            else:
-                return func(*args, **kwargs)
+        rlogger.info('params')
 
-        return params
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            return func(*args, **kwargs)
+
+        return wrapper
 
     @classmethod
     def get_handler_funcs(cls):
-        ls = [cls.log_start_handler,
-              cls.auth_handler,
-              cls.param_handler]
+        ls = [cls.auth_handler, cls.param_handler]
         return ls[::-1]
 
     @staticmethod
     def error_exception_handler(error):
-        logger.error(str(error))
+        rlogger.error(str(error))
         error_message = str(error)
         return ResponseJson(data='', code=500, message=error_message).to_dict()
 
     @staticmethod
     def error_404_handler(error):
-        logger.error('Not Found')
+        rlogger.error('Not Found')
+        slogger.info(ServerLogContent(action='response', code=404, error_message='Resource Not Found').to_dict())
         return ResponseJson(data='', code=404, message=str(error)).to_dict()
 
     @staticmethod
-    def after_request_handler(response):
-        print(type(response))
+    def after_handler(response):
+        rlogger.info(f'{threading.current_thread().name} {response.status_code}')
+        if response.status_code == 200:
+            slogger.info(ServerLogContent(action='response', code=response.status_code).to_dict())
         return response
 
     @staticmethod
-    def before_request_handler():
-        threading.current_thread().name = uuid.uuid4().hex
+    def before_handler():
+        request_id = uuid.uuid4().hex
+        threading.current_thread().name = request_id
+
+        rlogger.info(f'request ID: {request_id}')
+        rlogger.info(f'{request.method} {request.path} {request.remote_addr}')
+        rlogger.info(f'authorization: {request.authorization}')
+
+        slogger.info(ServerLogContent(action='receive').to_dict())
 
 
 class ServiceHandler(Resource):
@@ -83,7 +81,7 @@ class ServiceHandler(Resource):
     method_decorators = HandlerFuncs.get_handler_funcs()
 
     @staticmethod
-    def response(data, dtype='json', code=200):
+    def output(data, dtype='json', code=200):
 
         match dtype:
             case 'json':

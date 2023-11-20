@@ -10,6 +10,7 @@ class Dir:
 
 
 class AppConf:
+    VERSION = '1.0.0'
     HOST = '0.0.0.0'
     PORT = '9938'
     DEBUG = True
@@ -18,9 +19,12 @@ class AppConf:
 
 class LogConf:
     RUNTIME_FILE = Dir.LOG / 'runtime.log'
-    RUNTIME_FORMAT = '{time:HH:mm:ss.SSS} - {file} - {function}() - {line} - [{thread.name}] - {level} - {message}'
     SERVER_FILE = Dir.LOG / 'server.log'
 
+    RUNTIME_FORMAT = '{time:YYYY-MM-DD HH:mm:ss.SSS} - [{thread.name}] - {file} - {function}() - {line} - {level} - {message}'
+    STDOUT_FORMAT = '{time:HH:mm:ss.SSS} | {level:<8} | {file}:{function}():{line} | {message}'
+    SERVER_FORMAT = '{message}'
 
+    console_format = '{time:HH:mm:ss.SSS} | {level:<8} | {file}:{function}():{line} | {message}'
 class ConfigureFile:
     ENV = Dir.ROOT / '.env'
