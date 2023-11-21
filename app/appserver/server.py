@@ -1,15 +1,18 @@
 from flask import Flask
 from flask_restful import Api
+from flask_apscheduler import APScheduler
 from app.appserver.config import Dir, ConfigureFile, AppConf
 from datetime import datetime
 import sys
 import psutil
-from app.appserver.handler import ServiceHandler, HandlerFuncs
-from app import service
+from app.appserver.handler import HandlerFuncs
+
 
 class Server:
     def __init__(self, name, host=None, port=None, debug=None):
         self.app = Flask(name)
+        self.scheduler = APScheduler()
+        self.api = Api(self.app, prefix=AppConf.PROJECT_PREFIX)
         self.host = host or AppConf.HOST
         self.port = port or AppConf.PORT
         self.debug = debug if debug is not None else AppConf.DEBUG
@@ -18,7 +21,6 @@ class Server:
         self.init_dirs()
         self.init_db()
         self.import_services()
-        self.add_routers()
         self.add_handlers()
         self.add_scheduler()
         self.server_info()
@@ -27,11 +29,6 @@ class Server:
     def import_services(self):
         pass
 
-    def add_routers(self):
-        api = Api(self.app, prefix=AppConf.PROJECT_PREFIX)
-        for s in ServiceHandler.__subclasses__():
-            api.add_resource(s, s.URL)
-
     def add_handlers(self):
         self.app.errorhandler(Exception)(HandlerFuncs.error_exception_handler)
         self.app.errorhandler(404)(HandlerFuncs.error_404_handler)
@@ -39,7 +36,8 @@ class Server:
         self.app.after_request(HandlerFuncs.after_handler)
 
     def add_scheduler(self):
-        pass
+        self.scheduler.init_app(self.app)
+        self.scheduler.start()
 
     def init_db(self):
         pass

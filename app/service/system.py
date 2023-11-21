@@ -1,10 +1,12 @@
-from app.appserver import ServiceHandler, server, log
+from app.appserver import ServiceHandler, server, log, api
 from app.appserver.config import LogConf
 import pandas as pd
 
+PREFIX = '/system'
 
+
+@api(f'{PREFIX}/urls')
 class AllUrls(ServiceHandler):
-    URL = '/system/urls'
 
     def get(self):
         log.info('start server')
@@ -15,8 +17,8 @@ class AllUrls(ServiceHandler):
         return self.output(data, code=200)
 
 
+@api(f'{PREFIX}/log')
 class ServerLog(ServiceHandler):
-    URL = '/system/log'
 
     def get(self):
         with open(LogConf.SERVER_FILE, 'r') as f:
@@ -26,8 +28,8 @@ class ServerLog(ServiceHandler):
         return self.output(df_log.to_dict(orient='records'))
 
 
+@api(f'{PREFIX}/log/<request_id>')
 class RuntimeLog(ServiceHandler):
-    URL = '/system/log/<request_id>'
 
     def get(self, request_id):
         return self.output({'request_id': request_id})

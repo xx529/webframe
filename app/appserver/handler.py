@@ -77,15 +77,14 @@ class HandlerFuncs:
 
 
 class ServiceHandler(Resource):
-    URL: str
     method_decorators = HandlerFuncs.get_handler_funcs()
 
     @staticmethod
-    def output(data, dtype='json', code=200):
+    def output(data, dtype='json', code=200, message=''):
 
         match dtype:
             case 'json':
-                return ResponseJson(data, code).to_dict()
+                return ResponseJson(data, code, message).to_dict()
             case 'text':
                 return data, code, {'Content-Type': 'text/plain'}
             case _:

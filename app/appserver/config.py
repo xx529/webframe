@@ -26,5 +26,7 @@ class LogConf:
     SERVER_FORMAT = '{message}'
 
     console_format = '{time:HH:mm:ss.SSS} | {level:<8} | {file}:{function}():{line} | {message}'
+
+
 class ConfigureFile:
     ENV = Dir.ROOT / '.env'
