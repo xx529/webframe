@@ -9,7 +9,7 @@ class Dir:
     RESOURCE = ROOT / 'resource'
 
 
-class AppConf:
+class ServerConf:
     VERSION = '1.0.0'
     HOST = '0.0.0.0'
     PORT = '9938'
@@ -17,7 +17,7 @@ class AppConf:
     PROJECT_PREFIX = '/hang'
 
 
-class LogConf:
+class Log:
     RUNTIME_FILE = Dir.LOG / 'runtime.log'
     SERVER_FILE = Dir.LOG / 'server.log'
 
@@ -28,5 +28,5 @@ class LogConf:
     console_format = '{time:HH:mm:ss.SSS} | {level:<8} | {file}:{function}():{line} | {message}'
 
 
-class ConfigureFile:
+class FilePath:
     ENV = Dir.ROOT / '.env'

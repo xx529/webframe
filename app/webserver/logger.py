@@ -4,26 +4,26 @@ from dataclasses import asdict, dataclass
 
 from flask import request
 from loguru import logger
-from app.appserver.config import AppConf, LogConf
+from app.resource.config import ServerConf, Log
 import sys
 
 logger.remove()
 
 # 运行日志记录到文件
-logger.add(sink=LogConf.RUNTIME_FILE,
-           format=LogConf.RUNTIME_FORMAT,
+logger.add(sink=Log.RUNTIME_FILE,
+           format=Log.RUNTIME_FORMAT,
            level='INFO',
            filter=lambda x: x['extra']['name'] == 'runtime')
 
 # 运行日志记录到标准输出
 logger.add(sink=sys.stdout,
-           format=LogConf.STDOUT_FORMAT,
+           format=Log.STDOUT_FORMAT,
            level='INFO',
            filter=lambda x: x['extra']['name'] == 'runtime')
 
 # 服务请求日志
-logger.add(sink=LogConf.SERVER_FILE,
-           format=LogConf.SERVER_FORMAT,
+logger.add(sink=Log.SERVER_FILE,
+           format=Log.SERVER_FORMAT,
            level='INFO',
            filter=lambda x: x['extra']['name'] == 'server')
 
@@ -45,7 +45,7 @@ class ServerLogContent:
     frid: str = 'main'
     error_message: str = ''
     traceback: str = ''
-    version: str = AppConf.VERSION
+    version: str = ServerConf.VERSION
 
     def __post_init__(self):
         self.datetime = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

@@ -1,4 +1,4 @@
-from app.appserver import api, ServiceHandler
+from app.webserver import api, ServiceHandler
 
 PREFIX = '/example'
 

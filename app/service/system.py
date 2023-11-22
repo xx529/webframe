@@ -1,5 +1,5 @@
-from app.appserver import ServiceHandler, server, log, api
-from app.appserver.config import LogConf
+from app.webserver import ServiceHandler, server, log, api
+from app.resource.config import Log
 import pandas as pd
 
 PREFIX = '/system'
@@ -21,7 +21,7 @@ class AllUrls(ServiceHandler):
 class ServerLog(ServiceHandler):
 
     def get(self):
-        with open(LogConf.SERVER_FILE, 'r') as f:
+        with open(Log.SERVER_FILE, 'r') as f:
             lines = [eval(x) for x in f.readlines()]
 
         df_log = pd.DataFrame(lines)

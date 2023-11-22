@@ -3,7 +3,7 @@ from dataclasses import dataclass, asdict
 from functools import wraps
 import threading
 import uuid
-from app.appserver.logger import ServerLogContent, slogger, rlogger
+from app.webserver.logger import ServerLogContent, slogger, rlogger
 from flask import request
 
 

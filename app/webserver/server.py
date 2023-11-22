@@ -1,21 +1,21 @@
 from flask import Flask
 from flask_restful import Api
 from flask_apscheduler import APScheduler
-from app.appserver.config import Dir, ConfigureFile, AppConf
+from app.resource.config import Dir, FilePath, ServerConf
 from datetime import datetime
 import sys
 import psutil
-from app.appserver.handler import HandlerFuncs
+from app.webserver.handler import HandlerFuncs
 
 
 class Server:
     def __init__(self, name, host=None, port=None, debug=None):
         self.app = Flask(name)
         self.scheduler = APScheduler()
-        self.api = Api(self.app, prefix=AppConf.PROJECT_PREFIX)
-        self.host = host or AppConf.HOST
-        self.port = port or AppConf.PORT
-        self.debug = debug if debug is not None else AppConf.DEBUG
+        self.api = Api(self.app, prefix=ServerConf.PROJECT_PREFIX)
+        self.host = host or ServerConf.HOST
+        self.port = port or ServerConf.PORT
+        self.debug = debug if debug is not None else ServerConf.DEBUG
 
     def run(self):
         self.init_dirs()
@@ -55,16 +55,16 @@ class Server:
 
     def server_info(self):
         print(f"""
-    ######################### Version {AppConf.VERSION} #########################
+    ######################### Version {ServerConf.VERSION} #########################
     | python    | {sys.version}
     | platform  | {sys.platform}
     | cpus      | {psutil.cpu_count()}
     | start     | {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
     | urls      | {self.count_urls}
-    | prefix    | {AppConf.PROJECT_PREFIX}
+    | prefix    | {ServerConf.PROJECT_PREFIX}
     | root      | {Dir.ROOT}
     | data      | {Dir.DATA}
     | log       | {Dir.LOG}
-    | .env      | {ConfigureFile.ENV}
+    | .env      | {FilePath.ENV}
     ################################################################
         """)
